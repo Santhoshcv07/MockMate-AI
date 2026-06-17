@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase"; // <-- NEW: Importing our database connection
+import { useRouter } from "next/navigation";
+import { supabaseClient } from "@/lib/supabase-client";
 
 type Step = "setup" | "loading" | "interview" | "feedback";
 
 export default function InterviewPage() {
+  const router = useRouter();
+  
+  // Auth States
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
   // Navigation & UI States
   const [step, setStep] = useState<Step>("setup");
   const [loadingMessage, setLoadingMessage] = useState("");
@@ -33,7 +40,20 @@ export default function InterviewPage() {
     suggestions: [] as string[],
   });
 
-  // Step 1: Tell Gemini to generate 3 distinct questions
+  // GATEKEEPER: Ensure the user is logged in before showing the page
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      } else {
+        setUserId(session.user.id);
+        setIsAuthChecking(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   const startInterview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!role || !techStack) return alert("Please fill out all fields.");
@@ -53,13 +73,11 @@ export default function InterviewPage() {
       const data = await res.json();
       
       if (!data?.text) {
-  alert("No response received from Gemini.");
-  return;
+  throw new Error("No response received from Gemini.");
 }
 
-
-      const parsedQuestions = data.text
-        .split("\n")
+const parsedQuestions = data.text
+  .split("\n")
         .map((q: string) => q.replace(/^\d+[\.\s\-]+/, "").trim())
         .filter((q: string) => q.length > 5);
 
@@ -76,7 +94,6 @@ export default function InterviewPage() {
     }
   };
 
-  // Step 2: Handle moving from question to question
   const handleNextQuestion = () => {
     const updatedAnswers = [...answers, currentAnswer || "No answer provided."];
     setAnswers(updatedAnswers);
@@ -89,7 +106,6 @@ export default function InterviewPage() {
     }
   };
 
-  // Step 3: Send questions & answers to Gemini, THEN save to Supabase
   const generateFinalFeedback = async (finalAnswers: string[]) => {
     setStep("loading");
     setLoadingMessage("Analyzing your answers and generating your scorecard...");
@@ -113,7 +129,6 @@ export default function InterviewPage() {
     Do not wrap your response in markdown code blocks. Return only the raw JSON.`;
 
     try {
-      // 1. Get AI Analysis
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,13 +139,13 @@ export default function InterviewPage() {
       const cleanedJsonString = data.text.replace(/```json|```/gi, "").trim();
       const parsedFeedback = JSON.parse(cleanedJsonString);
       
-      // 2. Show user the feedback instantly
       setFeedback(parsedFeedback);
       setStep("feedback");
 
-      // 3. NEW: Silently save this data to our Supabase database in the background!
-      const { error: dbError } = await supabase.from("interviews").insert([
+      // SECURE SAVE: We are now attaching the specific user_id!
+      const { error: dbError } = await supabaseClient.from("interviews").insert([
         {
+          user_id: userId, // <-- This ensures it belongs only to them
           job_role: role,
           experience_level: experience,
           tech_stack: techStack,
@@ -154,13 +169,17 @@ export default function InterviewPage() {
     }
   };
 
+  // Prevent flashing the interface before redirecting
+  if (isAuthChecking) {
+    return <div className="min-h-screen bg-[#0f1115]" />;
+  }
+
   return (
     <main className="min-h-screen bg-[#0f1115] text-white p-4 md:p-8 flex items-center justify-center relative">
       <div className="absolute top-0 right-0 w-80 h-80 bg-[#ff5722] rounded-full blur-[180px] opacity-10 pointer-events-none" />
       
       <div className="w-full max-w-3xl bg-[#161920]/80 backdrop-blur-md border border-gray-800 rounded-2xl p-6 md:p-10 shadow-2xl">
         
-        {/* PHASE 1: CONFIGURATION FORM */}
         {step === "setup" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <h2 className="text-3xl font-bold mb-2">Configure Mock Interview</h2>
@@ -209,7 +228,6 @@ export default function InterviewPage() {
           </motion.div>
         )}
 
-        {/* PHASE 2: SPINNER LOADING STATE */}
         {step === "loading" && (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
             <div className="w-12 h-12 border-4 border-[#ff5722] border-t-transparent rounded-full animate-spin" />
@@ -217,7 +235,6 @@ export default function InterviewPage() {
           </div>
         )}
 
-        {/* PHASE 3: INTERVIEW LIVE SIMULATION */}
         {step === "interview" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -252,7 +269,6 @@ export default function InterviewPage() {
           </motion.div>
         )}
 
-        {/* PHASE 4: ANALYTICS FEEDBACK SCORECARD */}
         {step === "feedback" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
             <div className="text-center">
@@ -302,7 +318,6 @@ export default function InterviewPage() {
               <button onClick={() => setStep("setup")} className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl font-bold transition-all text-sm mb-3">
                 Try Another Session
               </button>
-              {/* NEW: Added a button to view the dashboard! */}
               <Link href="/dashboard" className="block text-center text-[#ff5722] hover:text-[#e64a19] font-semibold text-sm mb-3 transition-colors">
                 View My Dashboard
               </Link>
