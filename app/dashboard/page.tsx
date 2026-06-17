@@ -20,7 +20,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   
-  // New Analytics State
   const [stats, setStats] = useState({ total: 0, avgScore: 0, bestScore: 0 });
   
   const router = useRouter();
@@ -50,10 +49,18 @@ export default function DashboardPage() {
       if (data && data.length > 0) {
         setInterviews(data);
         
-        // Calculate Analytics
+        // BUG FIX 4: Safely calculate stats by ignoring corrupted/missing data rows
+        const validScores = data
+          .map(i => i.overall_score)
+          .filter(score => typeof score === 'number' && !isNaN(score));
+
         const total = data.length;
-        const avgScore = Math.round(data.reduce((acc, curr) => acc + curr.overall_score, 0) / total);
-        const bestScore = Math.max(...data.map(i => i.overall_score));
+        const avgScore = validScores.length > 0 
+          ? Math.round(validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length) 
+          : 0;
+        const bestScore = validScores.length > 0 
+          ? Math.max(...validScores) 
+          : 0;
         
         setStats({ total, avgScore, bestScore });
       }
@@ -71,13 +78,11 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-[#0f1115] text-white p-6 md:p-12 relative overflow-hidden">
-      {/* Background Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#ff5722] rounded-full blur-[200px] opacity-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#ff5722] rounded-full blur-[150px] opacity-5 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         
-        {/* Header Section in White Glassmorphism */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl">
           <div className="text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
@@ -113,7 +118,6 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* NEW: Top Analytics KPI Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-col items-center justify-center text-center shadow-lg">
                 <span className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2">Total Interviews</span>
@@ -131,7 +135,6 @@ export default function DashboardPage() {
               </motion.div>
             </div>
 
-            {/* Glassmorphism Data Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {interviews.map((interview, index) => (
                 <motion.div

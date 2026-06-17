@@ -62,7 +62,8 @@ export default function InterviewPage() {
     setLoadingMessage("MockMate AI is crafting your custom interview questions...");
 
     const prompt = `You are an expert interviewer. Generate exactly 3 technical and behavioral interview questions for a ${experience} ${role} specializing in ${techStack}. 
-    Format your response as a simple list where each question is on a completely new line starting with a number. Do not write any introduction text or conversational filler.`;
+    Respond ONLY with a valid JSON array of strings. Do not include markdown formatting, introductions, or conversational filler.
+    Example format: ["Question 1", "Question 2", "Question 3"]`;
 
     try {
       const res = await fetch("/api/chat", {
@@ -72,24 +73,33 @@ export default function InterviewPage() {
       });
       const data = await res.json();
       
+      // Robust Error Parsing: Handle 500 backend payloads explicitly
+      if (!res.ok) {
+        throw new Error(data.error || `Server returned response code: ${res.status}`);
+      }
+
       if (!data?.text) {
-  throw new Error("No response received from Gemini.");
-}
+        throw new Error("No response content text received from Gemini.");
+      }
 
-const parsedQuestions = data.text
-  .split("\n")
-        .map((q: string) => q.replace(/^\d+[\.\s\-]+/, "").trim())
-        .filter((q: string) => q.length > 5);
+      const cleanedText = data.text.replace(/```json|```/gi, "").trim();
+      const jsonMatch = cleanedText.match(/\[[\s\S]*\]/);
+      
+      if (!jsonMatch) throw new Error("Failed to isolate JSON array formatting structures from AI.");
+      
+      const parsedQuestions = JSON.parse(jsonMatch[0]);
 
-      if (parsedQuestions.length === 0) throw new Error("No questions parsed");
+      if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
+        throw new Error("Extracted dataset failed array validation requirements.");
+      }
 
       setQuestions(parsedQuestions);
       setAnswers([]);
       setCurrentQuestionIndex(0);
       setStep("interview");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to generate questions. Please try again.");
+      alert(`Interview Setup Failed: ${err.message || "Please check server logs."}`);
       setStep("setup");
     }
   };
@@ -117,7 +127,7 @@ const parsedQuestions = data.text
       dynamicReviewPrompt += `Question ${i + 1}: ${q}\nAnswer ${i + 1}: ${finalAnswers[i]}\n\n`;
     });
 
-    dynamicReviewPrompt += `Provide a comprehensive performance evaluation. You must respond ONLY with a single JSON object matching this structure:
+    dynamicReviewPrompt += `Provide a comprehensive performance evaluation. You must respond ONLY with a single JSON object matching this exact structure:
     {
       "overallScore": 85,
       "technicalScore": 80,
@@ -126,7 +136,7 @@ const parsedQuestions = data.text
       "weaknesses": ["list item 1", "list item 2"],
       "suggestions": ["list item 1", "list item 2"]
     }
-    Do not wrap your response in markdown code blocks. Return only the raw JSON.`;
+    Do not wrap your response in markdown code blocks. Return only the raw JSON object.`;
 
     try {
       const res = await fetch("/api/chat", {
@@ -136,16 +146,24 @@ const parsedQuestions = data.text
       });
       const data = await res.json();
       
-      const cleanedJsonString = data.text.replace(/```json|```/gi, "").trim();
-      const parsedFeedback = JSON.parse(cleanedJsonString);
+      if (!res.ok) {
+        throw new Error(data.error || `Evaluation backend returned status code: ${res.status}`);
+      }
+
+      const cleanedText = data.text.replace(/```json|```/gi, "").trim();
+      const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
+      
+      if (!jsonMatch) throw new Error("Failed to isolate JSON summary formatting structures from AI.");
+      
+      const parsedFeedback = JSON.parse(jsonMatch[0]);
       
       setFeedback(parsedFeedback);
       setStep("feedback");
 
-      // SECURE SAVE: We are now attaching the specific user_id!
+      // SECURE DB PERSISTENCE
       const { error: dbError } = await supabaseClient.from("interviews").insert([
         {
-          user_id: userId, // <-- This ensures it belongs only to them
+          user_id: userId,
           job_role: role,
           experience_level: experience,
           tech_stack: techStack,
@@ -158,18 +176,15 @@ const parsedQuestions = data.text
         }
       ]);
 
-      if (dbError) {
-        console.error("Supabase Save Error:", dbError);
-      }
+      if (dbError) throw dbError;
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error generating feedback dashboard.");
+      alert(`Evaluation Engine Error: ${err.message || "Please check connection contexts."}`);
       setStep("setup");
     }
   };
 
-  // Prevent flashing the interface before redirecting
   if (isAuthChecking) {
     return <div className="min-h-screen bg-[#0f1115]" />;
   }

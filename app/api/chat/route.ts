@@ -1,38 +1,32 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
-
-// Initialize the Google Gen AI SDK
-// We explicitly pass the API key from our secure .env.local file
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+import Groq from "groq-sdk";
 
 export async function POST(req: Request) {
   try {
-    // Read the message (prompt) sent from our frontend interface
-    const body = await req.json();
-    const { prompt } = body;
+    const { prompt } = await req.json();
 
     if (!prompt) {
-      return NextResponse.json(
-        { error: "A prompt is required." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Prompt required" }, { status: 400 });
     }
 
-    // Send the prompt to Gemini's ultra-fast flash model
-    const response = await ai.models.generateContent({
-   model: "gemini-2.5-flash",
-      contents: prompt,
+    // Initialize Groq
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    // Ask Llama 3.3 on Groq's super-fast hardware
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.3-70b-versatile", // CHANGED: Now using the fully supported, modern model
+      temperature: 0.7,
     });
 
-    // Send the AI's response back to our frontend
-    return NextResponse.json({ text: response.text });
+    // Extract the text and send it back to the frontend
+    const aiResponseText = chatCompletion.choices[0]?.message?.content || "";
+    return NextResponse.json({ text: aiResponseText });
     
-  } catch (error) {
-    console.error("Gemini API Error:", error);
+  } catch (error: any) {
+    console.error("Groq API Error:", error);
     return NextResponse.json(
-      { error: "Failed to generate AI response. Please check your API key or try again." },
+      { error: error.message || "Failed to connect to Groq." },
       { status: 500 }
     );
   }
