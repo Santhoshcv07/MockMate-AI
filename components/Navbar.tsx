@@ -56,6 +56,12 @@ export default function Navbar() {
                 <Link href="/dashboard" className="hover:text-white transition-colors hidden md:block">
                   Dashboard
                 </Link>
+                <Link
+  href="/resume"
+  className="hover:text-white transition-colors hidden md:block"
+>
+  Resume
+</Link>
                 <Link 
                   href="/interview" 
                   className="hover:text-white transition-colors hidden md:block"
