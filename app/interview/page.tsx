@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase-client";
+import DashboardNavbar from "@/components/layout/DashboardNavbar";
 
 declare global {
   interface Window {
@@ -278,11 +279,15 @@ export default function InterviewPage() {
   if (isAuthChecking) return <div className="min-h-screen bg-[#0f1115]" />;
 
   return (
-    <main className="min-h-screen bg-[#0f1115] text-white p-4 md:p-8 flex items-center justify-center relative overflow-hidden">
+    <main className="min-h-screen bg-[#0f1115] text-white p-4 pt-24 md:p-8 md:pt-32 flex flex-col items-center justify-center relative overflow-hidden">
+      
+      {/* AUTHENTICATED NAVBAR */}
+      <DashboardNavbar />
+
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#ff5722] rounded-full blur-[200px] opacity-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#ff5722] rounded-full blur-[150px] opacity-5 pointer-events-none" />
       
-      <div className="w-full max-w-4xl bg-[#161920]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl z-10 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-4xl bg-[#161920]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl z-10 flex flex-col max-h-[85vh]">
         
         {/* SETUP STEP */}
         {step === "setup" && (

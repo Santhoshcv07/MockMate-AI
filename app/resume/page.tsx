@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
+import DashboardNavbar from "@/components/layout/DashboardNavbar";
 
 interface UploadResponse {
   success: boolean;
@@ -91,9 +92,13 @@ export default function ResumePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0f1115] text-white p-6 md:p-12 flex items-center justify-center relative overflow-hidden">
-      <div className="absolute top-[-10%] right-[-10%] w-125 h-125 bg-[#ff5722] rounded-full blur-[200px] opacity-10 pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-100 h-100 bg-[#ff5722] rounded-full blur-[150px] opacity-5 pointer-events-none" />
+    <main className="min-h-screen bg-[#0f1115] text-white p-6 pt-28 md:p-12 md:pt-32 flex flex-col items-center justify-center relative overflow-hidden">
+      
+      {/* AUTHENTICATED NAVBAR */}
+      <DashboardNavbar />
+
+      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#ff5722] rounded-full blur-[200px] opacity-10 pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#ff5722] rounded-full blur-[150px] opacity-5 pointer-events-none" />
 
       <div className="w-full max-w-2xl z-10">
         <div className="mb-6">

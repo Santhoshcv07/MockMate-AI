@@ -1,97 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { supabaseClient } from "@/lib/supabase-client";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
-  const [isChecking, setIsChecking] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    // 1. Check if the user is already logged in when the page loads
-    const checkUser = async () => {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      setUser(session?.user || null);
-      setIsChecking(false);
-    };
-    checkUser();
-
-    // 2. Listen for real-time login/logout events across the app
-    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    // Cleanup listener when component unmounts
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabaseClient.auth.signOut();
-    router.push("/login"); // Teleport them back to login after signing out
-  };
-
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#0f1115]/80 backdrop-blur-md border-b border-gray-800">
-      <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 transition-all">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-extrabold tracking-tight hover:opacity-80 transition-opacity text-white">
-          MockMate <span className="text-[#ff5722]">AI</span>
+        {/* Left: Logo */}
+        <Link href="/" className="flex items-center gap-2 cursor-pointer">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#FF8C42] flex items-center justify-center shadow-[0_4px_10px_rgba(255,107,53,0.3)]">
+            <span className="font-black text-white text-xl">M</span>
+          </div>
+          <span className="font-bold text-xl tracking-tight text-[#111111]">MockMate <span className="text-[#666666]">AI</span></span>
         </Link>
 
-        {/* Navigation Links */}
-        <div className="flex gap-4 md:gap-6 items-center font-semibold text-sm text-gray-300">
-          {/* Prevent UI flickering while checking Auth status */}
-          {!isChecking && (
-            user ? (
-              /* -------- LOGGED IN NAVBAR -------- */
-              <>
-                <Link href="/dashboard" className="hover:text-white transition-colors hidden md:block">
-                  Dashboard
-                </Link>
-                <Link
-  href="/resume"
-  className="hover:text-white transition-colors hidden md:block"
->
-  Resume
-</Link>
-                <Link 
-                  href="/interview" 
-                  className="hover:text-white transition-colors hidden md:block"
-                >
-                  New Interview
-                </Link>
-                <button 
-                  onClick={handleSignOut}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white px-5 py-2.5 rounded-full transition-all shadow-lg"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              /* -------- LOGGED OUT NAVBAR -------- */
-              <>
-                <Link href="/login" className="hover:text-white transition-colors">
-                  Login
-                </Link>
-                <Link 
-                  href="/signup" 
-                  className="bg-[#ff5722] hover:bg-[#e64a19] text-white px-5 py-2.5 rounded-full transition-all shadow-md shadow-[#ff5722]/20"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )
-          )}
+        {/* Center: Navigation */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#666666]">
+          <Link href="/#features" className="hover:text-[#111111] transition-colors">Features</Link>
+          <Link href="/#how-it-works" className="hover:text-[#111111] transition-colors">How It Works</Link>
+          <Link href="/#dashboard" className="hover:text-[#111111] transition-colors">Analytics</Link>
+          <Link href="/#faq" className="hover:text-[#111111] transition-colors">FAQ</Link>
         </div>
-        
+
+        {/* Right: CTA Actions */}
+        <div className="flex items-center gap-5">
+          <Link href="/login" className="text-sm font-bold text-[#666666] hover:text-[#111111] transition-colors hidden sm:block">
+            Log in
+          </Link>
+          <Link href="/signup" className="text-sm font-bold bg-[#111111] text-white px-6 py-2.5 rounded-full hover:bg-gray-800 transition-all shadow-md hover:-translate-y-0.5 hover:shadow-lg">
+            Sign Up Free
+          </Link>
+        </div>
+
       </div>
     </nav>
   );

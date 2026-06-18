@@ -5,6 +5,7 @@ import { supabaseClient } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import DashboardNavbar from "@/components/layout/DashboardNavbar";
 import {
   ResponsiveContainer,
   LineChart,
@@ -280,7 +281,11 @@ export default function DashboardPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#0f1115] text-white p-6 md:p-12 relative overflow-hidden">
+    <main className="min-h-screen bg-[#0f1115] text-white pt-24 pb-6 px-6 md:pt-28 md:pb-12 md:px-12 relative overflow-hidden">
+      
+      {/* AUTHENTICATED NAVBAR */}
+      <DashboardNavbar />
+
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#ff5722] rounded-full blur-[200px] opacity-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#ff5722] rounded-full blur-[150px] opacity-5 pointer-events-none" />
 
@@ -459,6 +464,7 @@ export default function DashboardPage() {
                               <motion.div initial={{ width: 0 }} animate={{ width: `${widthPercent}%` }} transition={{ duration: 1, ease: "easeOut", delay: idx * 0.1 }} className="h-full bg-gradient-to-r from-rose-600 to-rose-400 rounded-full" />
                             </div>
                           </div>
+                          
                         );
                       })}
                     </div>
