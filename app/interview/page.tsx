@@ -66,9 +66,15 @@ export default function InterviewPage() {
     Example format: ["Question 1", "Question 2", "Question 3"]`;
 
     try {
+      const {
+  data: { session },
+} = await supabaseClient.auth.getSession();
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+       headers: {
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${session?.access_token}`,
+},
         body: JSON.stringify({ prompt }),
       });
       const data = await res.json();
