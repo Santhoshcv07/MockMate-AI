@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { TypeAnimation } from "react-type-animation";
 import HeroRobot from "@/components/HeroRobot";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar"; // <-- Imported here exclusively
 
 // --- REUSABLE COMPONENTS ---
 const StatCounter = ({ value, label, suffix = "" }: { value: string, label: string, suffix?: string }) => (
@@ -40,8 +41,6 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
-  
-  // Rotating Text State
   const phrases = ["gets you hired.", "gets you prepare.", "gets you job.", "gets you shortlist."];
   const [phraseIndex, setPhraseIndex] = useState(0);
 
@@ -60,45 +59,37 @@ export default function LandingPage() {
   return (
     <main className="relative min-h-screen bg-white text-[#111111] selection:bg-[#FF6B35]/20 selection:text-[#111111] overflow-hidden font-sans">
       
-      {/* --- BACKGROUND GLOWS, GRIDS, & IMAGE LAYER --- */}
+      {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.1] z-0">
         <img src="/images/ai-bg.png" alt="" className="w-full h-full object-cover" />
       </div>
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#FF6B35] rounded-full blur-[150px] opacity-[0.05] pointer-events-none z-0" />
 
-      {/* --- UNIFIED NAVBAR --- */}
+      {/* --- RENDER NAVBAR EXPLICITLY ON LANDING PAGE --- */}
       <Navbar />
 
-      {/* --- 1. PREMIUM HERO SECTION --- */}
+      {/* 1. PREMIUM HERO SECTION */}
       <motion.section 
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative pt-8 pb-20 md:pt-10 md:pb-24 px-6 max-w-7xl mx-auto z-10"
+        className="relative pt-36 pb-20 md:pt-40 md:pb-24 px-6 max-w-7xl mx-auto z-10"
       >
-        {/* Subtle Floating Particles behind Hero content */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1.5 h-1.5 bg-[#FF6B35]/30 rounded-full blur-[1px]"
               style={{ top: `${20 + Math.random() * 60}%`, left: `${10 + Math.random() * 80}%` }}
-              animate={{
-                y: [0, -30, 0],
-                x: [0, i % 2 === 0 ? 15 : -15, 0],
-                opacity: [0.1, 0.4, 0.1]
-              }}
+              animate={{ y: [0, -30, 0], x: [0, i % 2 === 0 ? 15 : -15, 0], opacity: [0.1, 0.4, 0.1] }}
               transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
             />
           ))}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center relative z-10">
-          
           <div className="flex flex-col items-start z-20">
-            
-            {/* Animated Badges */}
             <div className="flex flex-wrap gap-3 mb-8">
               {[
                 { text: "Resume-Aware", icon: true, hideOnMobile: false },
@@ -120,23 +111,14 @@ export default function LandingPage() {
               ))}
             </div>
             
-            {/* Animated Headings */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6 text-[#111111]">
               <div className="flex flex-wrap gap-[0.25em] mb-1">
                 {headingWords.map((word, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.8 }}
-                    className="inline-block"
-                  >
+                  <motion.span key={i} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.8 }} className="inline-block">
                     {word}
                   </motion.span>
                 ))}
               </div>
-              
-              {/* Rotating Animated Text */}
               <div className="relative h-[1.3em] w-full overflow-hidden block">
                 <AnimatePresence mode="popLayout">
                   <motion.span
@@ -153,32 +135,13 @@ export default function LandingPage() {
               </div>
             </h1>
             
-            {/* Animated Description */}
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-lg md:text-xl text-[#666666] max-w-lg leading-relaxed mb-10 font-medium"
-            >
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.8 }} className="text-lg md:text-xl text-[#666666] max-w-lg leading-relaxed mb-10 font-medium">
               MockMate AI reads your resume, conducts real-time voice interviews, and delivers granular analytics so you can ace the real thing.
             </motion.p>
             
-            {/* Animated Buttons */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-            >
-              {/* Primary Button with Glow Pulse */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8 }} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <motion.div
-                animate={{
-                  boxShadow: [
-                    "0 0 0px rgba(255,107,53,0)", 
-                    "0 0 25px rgba(255,107,53,0.35)", 
-                    "0 0 0px rgba(255,107,53,0)"
-                  ]
-                }}
+                animate={{ boxShadow: ["0 0 0px rgba(255,107,53,0)", "0 0 25px rgba(255,107,53,0.35)", "0 0 0px rgba(255,107,53,0)"] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="rounded-full"
               >
@@ -196,7 +159,6 @@ export default function LandingPage() {
                 </a>
               </motion.div>
             </motion.div>
-
           </div>
 
           <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center lg:justify-end mt-10 lg:mt-0 z-20">
@@ -204,11 +166,10 @@ export default function LandingPage() {
               <HeroRobot />
             </div>
           </div>
-
         </div>
       </motion.section>
 
-      {/* --- 2. WHY MOCKMATE (COMPARISON) --- */}
+      {/* 2. WHY MOCKMATE (COMPARISON) */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-24 max-w-7xl mx-auto px-6"
@@ -252,7 +213,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 3. FEATURES GRID --- */}
+      {/* 3. FEATURES GRID */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         id="features" className="relative z-10 py-24 bg-white/40 backdrop-blur-sm"
@@ -287,7 +248,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 4. INTERACTIVE VOICE DEMO HIGHLIGHT --- */}
+      {/* 4. INTERACTIVE VOICE DEMO HIGHLIGHT */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-24 bg-[#0F1115] text-white"
@@ -315,14 +276,14 @@ export default function LandingPage() {
             <p className="text-gray-300 leading-relaxed min-h-[100px]">
               "For the state management, I decided to use the Context API instead of Redux because the application scale was relatively small, and I wanted to avoid unnecessary boilerplate..."
             </p>
-            <div className="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-rose-500 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)]">
+            <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)]">
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm3 1h8v8H6V6z" clipRule="evenodd" /></svg>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* --- 5. HOW IT WORKS (TIMELINE) --- */}
+      {/* 5. HOW IT WORKS (TIMELINE) */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         id="how-it-works" className="relative z-10 py-24 bg-white/30 backdrop-blur-md border-y border-white/50"
@@ -354,55 +315,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 6. DASHBOARD SHOWCASE --- */}
-      <motion.section 
-        initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-        id="dashboard" className="relative z-10 py-32 max-w-7xl mx-auto px-6 overflow-hidden"
-      >
-        <div className="text-center mb-20 relative z-20">
-          <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Recruiter-Grade <span className="text-[#FF6B35]">Analytics</span></h2>
-          <p className="text-lg text-[#666666] max-w-2xl mx-auto font-medium">Don't just practice in the dark. Visualize your weaknesses, track your performance trends, and measure your resume alignment score.</p>
-        </div>
-
-        <div className="relative w-full max-w-5xl mx-auto rounded-2xl border border-gray-800 bg-[#0F1115] shadow-[0_25px_80px_rgba(0,0,0,0.15)] hover:scale-[1.02] transition-all duration-500 overflow-hidden">
-          <div className="h-12 bg-[#161920] border-b border-gray-800 flex items-center px-4 gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-rose-500" />
-            <div className="w-3.5 h-3.5 rounded-full bg-amber-500" />
-            <div className="w-3.5 h-3.5 rounded-full bg-emerald-500" />
-          </div>
-          
-          <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="col-span-1 md:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 shadow-inner">
-              <h3 className="font-bold mb-6 text-white tracking-wide">Performance Trend</h3>
-              <svg className="w-full h-40" viewBox="0 0 200 50" preserveAspectRatio="none">
-                <path d="M0,40 Q25,30 50,35 T100,20 T150,25 T200,5" fill="none" stroke="#FF6B35" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="50" cy="35" r="4" fill="#161920" stroke="#FF6B35" strokeWidth="2" />
-                <circle cx="100" cy="20" r="4" fill="#161920" stroke="#FF6B35" strokeWidth="2" />
-                <circle cx="150" cy="25" r="4" fill="#161920" stroke="#FF6B35" strokeWidth="2" />
-                <circle cx="200" cy="5" r="4" fill="#FF6B35" />
-              </svg>
-            </div>
-            
-            <div className="col-span-1 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center shadow-inner">
-              <h3 className="font-bold mb-4 w-full text-left text-white tracking-wide">Skill Radar</h3>
-              <div className="relative w-36 h-36">
-                <svg viewBox="0 0 100 100" className="w-full h-full opacity-80">
-                  <polygon points="50,5 95,30 80,85 20,85 5,30" fill="none" stroke="#444" strokeWidth="1" strokeDasharray="3 3"/>
-                  <polygon points="50,20 80,40 70,75 30,75 20,40" fill="rgba(255,107,53,0.35)" stroke="#FF6B35" strokeWidth="2" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-
-            <div className="col-span-1 md:col-span-3 grid grid-cols-3 gap-6 mt-4">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center"><div className="text-3xl font-black text-[#FF6B35]">88%</div><div className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Match Score</div></div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center"><div className="text-3xl font-black text-emerald-400">92%</div><div className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Tech Score</div></div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center"><div className="text-3xl font-black text-cyan-400">85%</div><div className="text-xs text-gray-400 mt-2 font-bold uppercase tracking-wider">Comm Score</div></div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* --- 7. TESTIMONIALS --- */}
+      {/* 6. TESTIMONIALS */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-24 bg-white/40 backdrop-blur-sm border-y border-white/50"
@@ -453,7 +366,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 8. FAQ SECTION --- */}
+      {/* 7. FAQ SECTION */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         id="faq" className="relative z-10 py-32 bg-transparent"
@@ -469,7 +382,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 9. FINAL CTA --- */}
+      {/* 8. FINAL CTA */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-32 overflow-hidden bg-[#111111] text-white"
@@ -487,10 +400,7 @@ export default function LandingPage() {
                 "0 0 0px rgba(255,107,53,0.2)"
               ]
             }}
-            transition={{
-              duration: 2,
-              repeat: Infinity
-            }}
+            transition={{ duration: 2, repeat: Infinity }}
             className="inline-flex items-center justify-center gap-2 bg-[#FF6B35] hover:bg-[#e65a25] text-white px-10 py-5 rounded-full font-black text-xl transition-colors"
           >
             Start Practicing Free
@@ -499,7 +409,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 10. FOOTER --- */}
+      {/* 9. FOOTER */}
       <footer className="relative z-10 bg-white/80 backdrop-blur-xl border-t border-white/50 pt-16 pb-8 shadow-[0_-8px_30px_rgba(0,0,0,0.02)]">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2">

@@ -39,17 +39,26 @@ export default function LoginPage() {
       });
 
       if (error) throw error;
+      
+    
+      
       router.push("/dashboard");
     } catch (error: any) {
       setErrorMsg(error.message || "Failed to sign in. Please try again.");
       setLoading(false);
     }
   };
+  
 
   return (
-    <main className="relative min-h-screen bg-[#FAFAFA] text-[#111111] overflow-hidden font-sans flex items-center justify-center">
+    <main className="relative min-h-screen flex items-center justify-center bg-[#FAFAFA] text-[#111111] overflow-hidden font-sans">
       
-      
+      {/* --- BACKGROUND GLOWS, GRIDS, & IMAGE LAYER --- */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0">
+        <img src="/images/ai-bg.png" alt="" className="w-full h-full object-cover" />
+      </div>
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF6B35] rounded-full blur-[200px] opacity-[0.05] pointer-events-none z-0" />
       
       {/* --- CONTENT CONTAINER --- */}
       <div className="w-full max-w-7xl mx-auto px-6 py-12 lg:py-0 min-h-screen flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 relative z-10">
@@ -92,7 +101,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-3 gap-4 lg:gap-6 border-t border-gray-200 pt-8">
             <div>
               <div className="text-2xl lg:text-3xl font-black text-[#111111] flex items-center tracking-tight">
-                <AnimatedNumber value={10} />,<AnimatedNumber value={0} /> <AnimatedNumber value={0} /> <AnimatedNumber value={0} />+
+                <AnimatedNumber value={10} />,<AnimatedNumber value={0} />+
               </div>
               <div className="text-[#666666] text-[10px] lg:text-xs font-bold uppercase tracking-widest mt-1">Interviews</div>
             </div>
