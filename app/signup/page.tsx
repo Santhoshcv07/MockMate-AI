@@ -58,12 +58,7 @@ export default function SignupPage() {
   return (
     <main className="relative min-h-screen flex flex-col md:flex-row bg-white text-[#111111] selection:bg-[#FF6B35]/20 selection:text-[#111111] overflow-hidden font-sans">
       
-      {/* --- BACKGROUND GLOWS, GRIDS, & IMAGE LAYER (Matches Landing Page) --- */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.2] z-0">
-        <img src="/images/ai-bg.png" alt="" className="w-full h-full object-cover" />
-      </div>
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF6B35] rounded-full blur-[200px] opacity-[0.05] pointer-events-none z-0" />
+     
       
       {/* --- UNIFIED NAVBAR --- */}
       <Navbar />
@@ -118,7 +113,7 @@ export default function SignupPage() {
         >
           <div>
             <div className="text-3xl font-black text-[#111111] flex items-center tracking-tight">
-              <AnimatedNumber value={10} />,<AnimatedNumber value={0} />+
+              <AnimatedNumber value={10} />,<AnimatedNumber value={0} /> <AnimatedNumber value={0} /> <AnimatedNumber value={0} />+
             </div>
             <div className="text-[#666666] text-xs font-bold uppercase tracking-widest mt-1">Interviews</div>
           </div>

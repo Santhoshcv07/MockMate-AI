@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import HeroRobot from "@/components/HeroRobot";
 import Navbar from "@/components/Navbar";
@@ -40,18 +40,28 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
+  
+  // Rotating Text State
+  const phrases = ["gets you hired.", "gets you prepare.", "gets you job.", "gets you shortlist."];
+  const [phraseIndex, setPhraseIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+    const interval = setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    }, 2500);
+    return () => clearInterval(interval);
   }, []);
 
   if (!mounted) return <div className="min-h-screen bg-white" />;
+
+  const headingWords = "The AI Recruiter that".split(" ");
 
   return (
     <main className="relative min-h-screen bg-white text-[#111111] selection:bg-[#FF6B35]/20 selection:text-[#111111] overflow-hidden font-sans">
       
       {/* --- BACKGROUND GLOWS, GRIDS, & IMAGE LAYER --- */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.2] z-0">
+      <div className="fixed inset-0 pointer-events-none opacity-[0.1] z-0">
         <img src="/images/ai-bg.png" alt="" className="w-full h-full object-cover" />
       </div>
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
@@ -60,44 +70,143 @@ export default function LandingPage() {
       {/* --- UNIFIED NAVBAR --- */}
       <Navbar />
 
-      {/* --- 1. HERO SECTION --- */}
-      <section className="relative pt-8 pb-20 md:pt-10 md:pb-24 px-6 max-w-7xl mx-auto z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      {/* --- 1. PREMIUM HERO SECTION --- */}
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative pt-8 pb-20 md:pt-10 md:pb-24 px-6 max-w-7xl mx-auto z-10"
+      >
+        {/* Subtle Floating Particles behind Hero content */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1.5 h-1.5 bg-[#FF6B35]/30 rounded-full blur-[1px]"
+              style={{ top: `${20 + Math.random() * 60}%`, left: `${10 + Math.random() * 80}%` }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, i % 2 === 0 ? 15 : -15, 0],
+                opacity: [0.1, 0.4, 0.1]
+              }}
+              transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+            />
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center relative z-10">
           
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} className="flex flex-col items-start z-20">
-            {/* SaaS Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 mb-8 shadow-sm">
-              <span className="px-2 py-0.5 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] text-[10px] font-black uppercase tracking-widest">New</span>
-              <span className="text-xs font-semibold text-[#666666]">Conversational Voice AI is live</span>
+          <div className="flex flex-col items-start z-20">
+            
+            {/* Animated Badges */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              {[
+                { text: "Resume-Aware", icon: true, hideOnMobile: false },
+                { text: "Voice Interviews", icon: false, hideOnMobile: false },
+                { text: "AI Follow-Ups", icon: false, hideOnMobile: true }
+              ].map((badge, i) => (
+                <motion.span
+                  key={i}
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                  className={`px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 
+                    ${badge.icon ? "bg-[#FF6B35]/10 border-[#FF6B35]/20 text-[#FF6B35]" : "bg-gray-50 border-gray-200 text-[#666666]"}
+                    ${badge.hideOnMobile ? "hidden sm:flex" : "flex"}
+                  `}
+                >
+                  {badge.icon && <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35] animate-pulse" />}
+                  {badge.text}
+                </motion.span>
+              ))}
             </div>
             
+            {/* Animated Headings */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6 text-[#111111]">
-              The AI Recruiter that <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#FF8C42]">gets you hired.</span>
+              <div className="flex flex-wrap gap-[0.25em] mb-1">
+                {headingWords.map((word, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08, duration: 0.8 }}
+                    className="inline-block"
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </div>
+              
+              {/* Rotating Animated Text */}
+              <div className="relative h-[1.3em] w-full overflow-hidden block">
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={phraseIndex}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -40 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="absolute left-0 top-0 text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] whitespace-nowrap pb-2"
+                  >
+                    {phrases[phraseIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
             </h1>
             
-            <p className="text-lg md:text-xl text-[#666666] max-w-lg leading-relaxed mb-10 font-medium">
+            {/* Animated Description */}
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-lg md:text-xl text-[#666666] max-w-lg leading-relaxed mb-10 font-medium"
+            >
               MockMate AI reads your resume, conducts real-time voice interviews, and delivers granular analytics so you can ace the real thing.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/signup" className="flex items-center justify-center gap-2 bg-[#FF6B35] hover:bg-[#e65a25] text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-[0_8px_20px_rgba(255,107,53,0.3)] hover:-translate-y-0.5">
-                Start Free Interview
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-              </Link>
-              <a href="#how-it-works" className="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 text-[#111111] px-8 py-4 rounded-full font-bold text-lg transition-all shadow-sm hover:-translate-y-0.5">
-                How It Works
-              </a>
-            </div>
-          </motion.div>
+            {/* Animated Buttons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+            >
+              {/* Primary Button with Glow Pulse */}
+              <motion.div
+                animate={{
+                  boxShadow: [
+                    "0 0 0px rgba(255,107,53,0)", 
+                    "0 0 25px rgba(255,107,53,0.35)", 
+                    "0 0 0px rgba(255,107,53,0)"
+                  ]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="rounded-full"
+              >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                  <Link href="/signup" className="flex items-center justify-center gap-2 bg-[#FF6B35] hover:bg-[#e65a25] text-white px-8 py-4 rounded-full font-bold text-lg transition-colors">
+                    Start Free Interview
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                  </Link>
+                </motion.div>
+              </motion.div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.2 }} className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center lg:justify-end mt-10 lg:mt-0 z-20">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                <a href="#how-it-works" className="flex h-full items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 text-[#111111] px-8 py-4 rounded-full font-bold text-lg transition-colors shadow-sm">
+                  How It Works
+                </a>
+              </motion.div>
+            </motion.div>
+
+          </div>
+
+          <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center lg:justify-end mt-10 lg:mt-0 z-20">
             <div className="w-full max-w-[500px] aspect-square relative z-10">
               <HeroRobot />
             </div>
-          </motion.div>
+          </div>
+
         </div>
-      </section>
+      </motion.section>
 
       {/* --- 2. WHY MOCKMATE (COMPARISON) --- */}
       <motion.section 
@@ -178,7 +287,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 5. INTERACTIVE VOICE DEMO HIGHLIGHT --- */}
+      {/* --- 4. INTERACTIVE VOICE DEMO HIGHLIGHT --- */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-24 bg-[#0F1115] text-white"
@@ -206,14 +315,14 @@ export default function LandingPage() {
             <p className="text-gray-300 leading-relaxed min-h-[100px]">
               "For the state management, I decided to use the Context API instead of Redux because the application scale was relatively small, and I wanted to avoid unnecessary boilerplate..."
             </p>
-            <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)]">
+            <div className="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-rose-500 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)]">
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm3 1h8v8H6V6z" clipRule="evenodd" /></svg>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* --- 6. HOW IT WORKS (TIMELINE) --- */}
+      {/* --- 5. HOW IT WORKS (TIMELINE) --- */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         id="how-it-works" className="relative z-10 py-24 bg-white/30 backdrop-blur-md border-y border-white/50"
@@ -245,7 +354,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 7. DASHBOARD SHOWCASE --- */}
+      {/* --- 6. DASHBOARD SHOWCASE --- */}
       <motion.section 
         initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
         id="dashboard" className="relative z-10 py-32 max-w-7xl mx-auto px-6 overflow-hidden"
@@ -293,7 +402,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 8. TESTIMONIALS --- */}
+      {/* --- 7. TESTIMONIALS --- */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-24 bg-white/40 backdrop-blur-sm border-y border-white/50"
@@ -344,7 +453,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 9. FAQ SECTION --- */}
+      {/* --- 8. FAQ SECTION --- */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         id="faq" className="relative z-10 py-32 bg-transparent"
@@ -360,7 +469,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 10. FINAL CTA --- */}
+      {/* --- 9. FINAL CTA --- */}
       <motion.section 
         initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         className="relative z-10 py-32 overflow-hidden bg-[#111111] text-white"
@@ -390,7 +499,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* --- 11. FOOTER --- */}
+      {/* --- 10. FOOTER --- */}
       <footer className="relative z-10 bg-white/80 backdrop-blur-xl border-t border-white/50 pt-16 pb-8 shadow-[0_-8px_30px_rgba(0,0,0,0.02)]">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2">
