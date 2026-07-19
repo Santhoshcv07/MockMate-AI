@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="public/favicon.ico" alt="MockMate AI Logo" width="120" />
   <h1>🤖 MockMate AI</h1>
   <p><strong>Your Ultimate AI-Powered Mock Interview & Resume Assistant</strong></p>
   
