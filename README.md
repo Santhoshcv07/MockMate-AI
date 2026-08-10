@@ -97,6 +97,12 @@ mockmate-ai/
 ---
 
 ## 🚀 Setup & Deployment
+We want you to have MockMate AI running locally in less than 2 minutes.
+
+### Prerequisites
+- Node.js 20+
+- A [Supabase](https://supabase.com/) account
+- API Keys for [Groq](https://console.groq.com/) and/or Google Gemini
 
 
 ### Local Setup
