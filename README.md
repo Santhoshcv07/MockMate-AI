@@ -3,7 +3,11 @@
   <p><strong>Your Ultimate AI-Powered Mock Interview & Resume Assistant</strong></p>
   
   <p>
-    
+    <a href="#features">Features</a> •
+    <a href="#how-it-works">How It Works</a> •
+    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#setup--deployment">Setup</a> •
+    <a href="#future-scope">Future Scope</a>
   </p>
 
   <p>
