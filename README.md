@@ -29,9 +29,7 @@
 
 ## 🎯 What it does
 
-**MockMate AI** is a comprehensive platform designed to help job seekers crack their dream interviews. It leverages cutting-edge Generative AI (Groq & Google GenAI) to conduct realistic, dynamic mock interviews tailored to specific roles. 
 
-Beyond interviews, it features a powerful resume parser and analyzer that provides actionable feedback on your CV, ensuring you stand out to recruiters before the interview even begins. Complete with a stunning 3D interactive UI, real-time performance tracking, and seamless authentication.
 
 ---
 
